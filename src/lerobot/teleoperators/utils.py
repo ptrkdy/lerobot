@@ -77,6 +77,10 @@ def make_teleoperator_from_config(config: TeleoperatorConfig) -> Teleoperator:
         from .reachy2_teleoperator import Reachy2Teleoperator
 
         return Reachy2Teleoperator(config)
+    elif config.type == "uj201_leader":
+        from .uj201_leader import UJ201Leader
+
+        return UJ201Leader(config)
     else:
         try:
             return cast(Teleoperator, make_device_from_device_class(config))

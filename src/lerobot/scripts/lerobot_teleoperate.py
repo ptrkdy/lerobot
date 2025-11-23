@@ -29,6 +29,20 @@ lerobot-teleoperate \
     --display_data=true
 ```
 
+Example with UJ201 (9-DOF enhanced arm):
+
+```shell
+lerobot-teleoperate \
+    --robot.type=uj201_follower \
+    --robot.port=/dev/ttyACM0 \
+    --robot.cameras="{ front: {type: opencv, index_or_path: 0, width: 640, height: 480, fps: 30}}" \
+    --robot.id=my_uj201_follower \
+    --teleop.type=uj201_leader \
+    --teleop.port=/dev/ttyACM1 \
+    --teleop.id=my_uj201_leader \
+    --display_data=true
+```
+
 Example teleoperation with bimanual so100:
 
 ```shell
@@ -76,6 +90,7 @@ from lerobot.robots import (  # noqa: F401
     make_robot_from_config,
     so100_follower,
     so101_follower,
+    uj201_follower,
 )
 from lerobot.teleoperators import (  # noqa: F401
     Teleoperator,
@@ -87,6 +102,7 @@ from lerobot.teleoperators import (  # noqa: F401
     make_teleoperator_from_config,
     so100_leader,
     so101_leader,
+    uj201_leader,
 )
 from lerobot.utils.import_utils import register_third_party_devices
 from lerobot.utils.robot_utils import busy_wait

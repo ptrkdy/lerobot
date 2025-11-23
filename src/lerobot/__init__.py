@@ -166,6 +166,7 @@ available_robots = [
     "aloha",
     "so100",
     "so101",
+    "uj201",
 ]
 
 # lists all available cameras from `lerobot/cameras`

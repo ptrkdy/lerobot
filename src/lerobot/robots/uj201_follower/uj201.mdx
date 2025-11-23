@@ -1,0 +1,100 @@
+# UJ-201 Robot
+
+The UJ-201 is an enhanced version of the SO-101 robot arm with three additional motors providing improved shoulder mobility and dexterity.
+
+## Hardware Overview
+
+The UJ-201 extends the SO-101 design by adding:
+
+- **Shoulder Motor**: Primary shoulder rotation
+- **Gearbox Motor**: Secondary shoulder mechanism  
+- **Universal Joint Motor**: Additional shoulder articulation
+
+This results in a 9-DOF system compared to the SO-101's 6-DOF configuration.
+
+## Motor Configuration
+
+| Joint | Motor ID | Motor Type | Range | Description |
+|-------|----------|------------|-------|-------------|
+| shoulder | 1 | STS3215 | ±100% | Primary shoulder rotation |
+| gearbox | 2 | STS3215 | ±100% | Secondary shoulder mechanism |
+| universal_joint | 3 | STS3215 | ±100% | Universal joint articulation |
+| shoulder_pan | 4 | STS3215 | ±100% | Shoulder pan (SO-101 base) |
+| shoulder_lift | 5 | STS3215 | ±100% | Shoulder lift |
+| elbow_flex | 6 | STS3215 | ±100% | Elbow flexion |
+| wrist_flex | 7 | STS3215 | ±100% | Wrist flexion |
+| wrist_roll | 8 | STS3215 | ±100% | Wrist rotation |
+| gripper | 9 | STS3215 | 0-100% | Gripper control |
+
+## Usage Examples
+
+### Basic Configuration
+
+```python
+from lerobot.robots.uj201_follower import UJ201FollowerConfig, UJ201Follower
+from lerobot.teleoperators.uj201_leader import UJ201LeaderConfig, UJ201Leader
+
+# Configure follower robot
+robot_config = UJ201FollowerConfig(
+    port="/dev/ttyACM0",
+    id="my_uj201_follower"
+)
+
+# Configure leader for teleoperation  
+teleop_config = UJ201LeaderConfig(
+    port="/dev/ttyACM1",
+    id="my_uj201_leader"
+)
+
+# Initialize devices
+robot = UJ201Follower(robot_config)
+teleop = UJ201Leader(teleop_config)
+```
+
+### Recording Data
+
+```bash
+lerobot-record \
+  --robot.type=uj201_follower \
+  --robot.port=/dev/ttyACM0 \
+  --robot.id=my_uj201_follower \
+  --teleop.type=uj201_leader \
+  --teleop.port=/dev/ttyACM1 \
+  --teleop.id=my_uj201_leader \
+  --dataset.repo_id=your_username/uj201_dataset \
+  --dataset.num_episodes=50
+```
+
+### Training a Policy
+
+```bash
+lerobot-train \
+  --dataset.repo_id=your_username/uj201_dataset \
+  --policy.type=act \
+  --output_dir=outputs/train/uj201_act \
+  --job_name=uj201_training \
+  --policy.device=cuda
+```
+
+## Key Differences from SO-101
+
+1. **Additional Motors**: Three extra motors before the shoulder_lift stage provide enhanced articulation
+2. **Motor ID Mapping**: SO-101 motors are shifted to IDs 4-9 to accommodate new motors (1-3)
+3. **Enhanced Workspace**: Improved reachability and dexterity due to additional degrees of freedom
+4. **Backward Compatibility**: Maintains SO-101 joint naming for the core arm structure
+
+## Calibration
+
+The UJ-201 follows the same calibration procedure as other LeRobot arms:
+
+1. Connect to the robot
+2. Move to mid-range position when prompted
+3. Exercise all joints through their full range of motion
+4. Calibration data is automatically saved
+
+## Compatibility
+
+- **Policies**: Compatible with all LeRobot policies (ACT, Diffusion, etc.)
+- **Datasets**: Can use existing SO-101 datasets with appropriate feature mapping
+- **Cameras**: Supports same camera configurations as SO-101
+- **Async Inference**: Supported for real-time applications
