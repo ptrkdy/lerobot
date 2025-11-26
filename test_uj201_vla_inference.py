@@ -60,17 +60,16 @@ ROBOT_ID = "None"  # Set to your robot ID if you have calibration files
 # Camera configuration
 # NOTE: SmolVLA resizes images to 512x512 automatically with padding
 # Camera keys MUST match those used during training
+# Pretrained SmolVLA expects: camera1, camera2, camera3
 CAMERAS = {
-    "wrist": OpenCVCameraConfig(
-        name="wrist",
-        camera_index=0,
+    "camera1": OpenCVCameraConfig(
+        index_or_path=0,
         width=1280,
         height=960,
         fps=5,
     ),
-    "scene": OpenCVCameraConfig(
-        name="scene", 
-        camera_index=1,
+    "camera2": OpenCVCameraConfig(
+        index_or_path=1,
         width=1920,
         height=1080,
         fps=30,
@@ -78,7 +77,7 @@ CAMERAS = {
 }
 
 # Task specification (natural language instruction)
-TASK = "pick up the object and place it in the box"  # Modify for your task
+TASK = "pick up the red cube"  # Modified task
 ROBOT_TYPE = "uj201_follower"  # For multi-embodiment datasets
 
 # Test parameters
@@ -244,6 +243,13 @@ log_and_print(f"🤖 Robot Type: {ROBOT_TYPE}", output_file)
 log_and_print(f"📊 Episodes: {MAX_EPISODES}", output_file)
 log_and_print(f"📊 Steps per episode: {MAX_STEPS_PER_EPISODE}", output_file)
 
+log_and_print(f"\n⚠️  NOTE: Pretrained SmolVLA was trained on SO100 (6 motors).", output_file)
+log_and_print(f"   UJ201 has 9 motors. The model will output 6 actions.", output_file)
+log_and_print(f"   This test will likely fail. Options:", output_file)
+log_and_print(f"   1. Fine-tune SmolVLA on UJ201 data (recommended)", output_file)
+log_and_print(f"   2. Map 6 actions to 9 motors (workaround)", output_file)
+log_and_print(f"   3. Use this as architecture validation only", output_file)
+
 try:
     total_steps = 0
     inference_times = []
@@ -285,7 +291,31 @@ try:
             action = postprocess(action)
             
             # 6. Convert to robot action format
-            robot_action = make_robot_action(action, dataset_features)
+            # WORKAROUND: Pretrained model outputs 6 actions (SO100) but UJ201 has 9 motors
+            # We'll map the 6 actions and keep last 3 motors at current position
+            try:
+                robot_action = make_robot_action(action, dataset_features)
+            except IndexError as e:
+                # Model outputs fewer actions than robot needs
+                # Create action dict manually, padding missing motors
+                action_tensor = action.squeeze(0).to("cpu")
+                
+                # Get current positions for motors we won't control
+                current_obs = robot.get_observation()
+                
+                robot_action = {
+                    "shoulder.pos": float(action_tensor[0]) if len(action_tensor) > 0 else current_obs["shoulder.pos"],
+                    "gearbox.pos": float(action_tensor[1]) if len(action_tensor) > 1 else current_obs["gearbox.pos"],
+                    "universal_joint.pos": float(action_tensor[2]) if len(action_tensor) > 2 else current_obs["universal_joint.pos"],
+                    "shoulder_pan.pos": float(action_tensor[3]) if len(action_tensor) > 3 else current_obs["shoulder_pan.pos"],
+                    "shoulder_lift.pos": float(action_tensor[4]) if len(action_tensor) > 4 else current_obs["shoulder_lift.pos"],
+                    "elbow_flex.pos": float(action_tensor[5]) if len(action_tensor) > 5 else current_obs["elbow_flex.pos"],
+                    # Keep last 3 motors at current position (not controlled by pretrained model)
+                    "wrist_flex.pos": current_obs["wrist_flex.pos"],
+                    "wrist_roll.pos": current_obs["wrist_roll.pos"],
+                    "gripper.pos": current_obs["gripper.pos"],
+                }
+                log_and_print(f"   ⚠️  Using action padding workaround (6→9 motors)", output_file) if step == 0 else None
             
             # 7. Send action to robot
             action_start = time.time()

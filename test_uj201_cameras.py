@@ -58,8 +58,7 @@ print_section("Camera Configuration", output_file)
 
 # Camera 0: Lower resolution, lower fps (wrist camera)
 wrist_config = OpenCVCameraConfig(
-    name="wrist",
-    camera_index=0,
+    index_or_path=0,
     fps=5,
     width=1280,
     height=960,
@@ -67,20 +66,19 @@ wrist_config = OpenCVCameraConfig(
 
 # Camera 1: Higher resolution, higher fps (scene camera)
 scene_config = OpenCVCameraConfig(
-    name="scene",
-    camera_index=1,
+    index_or_path=1,
     fps=30,
     width=1920,
     height=1080,
 )
 
 log_and_print(f"📷 Wrist Camera Config:", output_file)
-log_and_print(f"   Index: {wrist_config.camera_index}", output_file)
+log_and_print(f"   Index: {wrist_config.index_or_path}", output_file)
 log_and_print(f"   Resolution: {wrist_config.width}x{wrist_config.height}", output_file)
 log_and_print(f"   FPS: {wrist_config.fps}", output_file)
 
 log_and_print(f"\n📷 Scene Camera Config:", output_file)
-log_and_print(f"   Index: {scene_config.camera_index}", output_file)
+log_and_print(f"   Index: {scene_config.index_or_path}", output_file)
 log_and_print(f"   Resolution: {scene_config.width}x{scene_config.height}", output_file)
 log_and_print(f"   FPS: {scene_config.fps}", output_file)
 
@@ -164,11 +162,11 @@ print_section("Test 2: Frame Rate Analysis", output_file)
 log_and_print("📊 Analyzing actual frame rates over 5 seconds...", output_file)
 
 try:
-    # Test wrist camera
+    # Test wrist camera (5fps needs 200ms per frame, use 500ms timeout for safety)
     wrist_count = 0
     wrist_start = time.time()
     while time.time() - wrist_start < 5.0:
-        _ = wrist_camera.async_read()
+        _ = wrist_camera.async_read(timeout_ms=500)
         wrist_count += 1
     wrist_actual_fps = wrist_count / 5.0
     
@@ -210,7 +208,7 @@ try:
         start = time.time()
         
         # Capture both cameras as close in time as possible
-        wrist_frame = wrist_camera.async_read()
+        wrist_frame = wrist_camera.async_read(timeout_ms=500)
         wrist_time = time.time()
         
         scene_frame = scene_camera.async_read()
@@ -248,7 +246,7 @@ try:
     snapshot_count = 0
     while True:
         # Capture frames
-        wrist_frame = wrist_camera.async_read()
+        wrist_frame = wrist_camera.async_read(timeout_ms=500)
         scene_frame = scene_camera.async_read()
         
         # Resize for display (scale down scene camera to match aspect ratio)
@@ -299,7 +297,7 @@ try:
     latencies = []
     for i in range(100):
         start = time.time()
-        wrist_frame = wrist_camera.async_read()
+        wrist_frame = wrist_camera.async_read(timeout_ms=500)
         scene_frame = scene_camera.async_read()
         latency = (time.time() - start) * 1000  # ms
         latencies.append(latency)

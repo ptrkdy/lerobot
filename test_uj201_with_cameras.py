@@ -60,15 +60,13 @@ print_section("Robot Configuration", output_file)
 # Camera configurations
 cameras = {
     "wrist": OpenCVCameraConfig(
-        name="wrist",
-        camera_index=0,
+        index_or_path=0,
         fps=5,
         width=1280,
         height=960,
     ),
     "scene": OpenCVCameraConfig(
-        name="scene",
-        camera_index=1,
+        index_or_path=1,
         fps=30,
         width=1920,
         height=1080,
@@ -91,7 +89,7 @@ log_and_print(f"   Max relative target: {robot_config.max_relative_target}°", o
 
 for cam_name, cam_config in cameras.items():
     log_and_print(f"\n📷 {cam_name.capitalize()} Camera:", output_file)
-    log_and_print(f"   Index: {cam_config.camera_index}", output_file)
+    log_and_print(f"   Index: {cam_config.index_or_path}", output_file)
     log_and_print(f"   Resolution: {cam_config.width}x{cam_config.height}", output_file)
     log_and_print(f"   FPS: {cam_config.fps}", output_file)
 
@@ -219,12 +217,14 @@ try:
     log_and_print(f"\n📈 Control Loop Performance:", output_file)
     log_and_print(f"   Maximum achievable frequency: {max_hz:.1f} Hz", output_file)
     
-    if max_hz >= 30:
-        log_and_print(f"   ✅ Suitable for 30 Hz VLA control loop", output_file)
-    elif max_hz >= 10:
-        log_and_print(f"   ⚠️  May need to reduce to {int(max_hz)} Hz control loop", output_file)
+    if max_hz >= 10:
+        log_and_print(f"   ✅ Suitable for VLA control loop (10+ Hz)", output_file)
+    elif max_hz >= 5:
+        log_and_print(f"   ✅ Suitable for slower VLA control (5-10 Hz)", output_file)
+    elif max_hz >= 2:
+        log_and_print(f"   ⚠️  Slow but usable for deliberate tasks (2-5 Hz)", output_file)
     else:
-        log_and_print(f"   ❌ Too slow for real-time control", output_file)
+        log_and_print(f"   ❌ Too slow for practical control (<2 Hz)", output_file)
     
 except Exception as e:
     log_and_print(f"❌ Benchmark failed: {e}", output_file)
@@ -292,7 +292,8 @@ try:
         # Display
         cv2.imshow("UJ201 Robot + Camera Observation", combined)
         
-        key = cv2.waitKey(1) & 0xFF
+        # waitKey needs at least 10ms to process events properly
+        key = cv2.waitKey(10) & 0xFF
         if key == ord('q'):
             log_and_print("\n⏹️  Display closed by user", output_file)
             break
