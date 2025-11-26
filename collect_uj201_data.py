@@ -46,7 +46,7 @@ def print_header(title):
     print(f"  {title}")
     print("=" * 80)
 
-def setup_robot(port, robot_id, cameras):
+def setup_robot(port, robot_id, cameras, is_leader=False):
     """Initialize robot with cameras."""
     config = UJ201FollowerConfig(
         port=port,
@@ -57,6 +57,12 @@ def setup_robot(port, robot_id, cameras):
     
     robot = UJ201Follower(config)
     robot.connect(calibrate=False)
+    
+    # Disable torque on leader for teleoperation
+    if is_leader:
+        robot.bus.disable_torque()
+        print(f"   ✅ Torque disabled on leader (free to move)")
+    
     return robot
 
 def save_episode(episode_data, output_dir, episode_num, task_description):
@@ -244,12 +250,12 @@ def main():
     
     try:
         print("🔌 Connecting to follower arm...")
-        follower = setup_robot(args.follower_port, "follower", cameras)
+        follower = setup_robot(args.follower_port, "follower", cameras, is_leader=False)
         print("✅ Follower connected")
         
         print("\n🔌 Connecting to leader arm...")
-        leader = setup_robot(args.leader_port, "leader", {})  # Leader doesn't need cameras
-        print("✅ Leader connected")
+        leader = setup_robot(args.leader_port, "leader", {}, is_leader=True)  # Leader doesn't need cameras
+        print("✅ Leader connected (torque disabled for teleoperation)")
         
     except Exception as e:
         print(f"\n❌ Failed to initialize robots: {e}")
