@@ -167,6 +167,12 @@ wandb/
 data/
 outputs/
 
+# Test result directories
+test_results/
+camera_test_results/
+robot_camera_test_results/
+vla_inference_results/
+
 # Translations
 *.mo
 *.pot
