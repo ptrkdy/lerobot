@@ -57,10 +57,11 @@ class UJ201Follower(Robot):
                 # SO101 motors - shifted motor IDs
                 "shoulder_pan": Motor(4, "sts3215", norm_mode_body),
                 "shoulder_lift": Motor(5, "sts3215", norm_mode_body),
-                "elbow_flex": Motor(6, "sts3215", norm_mode_body),
-                "wrist_flex": Motor(7, "sts3215", norm_mode_body),
-                "wrist_roll": Motor(8, "sts3215", norm_mode_body),
-                "gripper": Motor(9, "sts3215", MotorNormMode.RANGE_0_100),
+                "elbow_support": Motor(6, "sts3215", norm_mode_body),  # Torque support, coupled to elbow_flex
+                "elbow_flex": Motor(7, "sts3215", norm_mode_body),
+                "wrist_flex": Motor(8, "sts3215", norm_mode_body),
+                "wrist_roll": Motor(9, "sts3215", norm_mode_body),
+                "gripper": Motor(10, "sts3215", MotorNormMode.RANGE_0_100),
             },
             calibration=self.calibration,
         )

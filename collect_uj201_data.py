@@ -81,7 +81,7 @@ def save_episode(episode_data, output_dir, episode_num, task_description):
         "cameras": ["camera1", "camera2"],
         "motors": [
             "shoulder", "gearbox", "universal_joint",
-            "shoulder_pan", "shoulder_lift", "elbow_flex",
+            "shoulder_pan", "shoulder_lift", "elbow_support", "elbow_flex",
             "wrist_flex", "wrist_roll", "gripper"
         ],
     }
