@@ -1,10 +1,12 @@
 # Quick Start: UJ201 Camera + VLA Testing
 
+All scripts are located in `examples/uj201_follower/`. Run from the repository root:
+
 ## Test Sequence
 
 ### 1. Test Cameras Only
 ```bash
-python test_uj201_cameras.py
+python examples/uj201_follower/test_cameras.py
 ```
 - Validates both cameras work
 - Checks frame rates and latency
@@ -12,7 +14,7 @@ python test_uj201_cameras.py
 
 ### 2. Test Robot + Cameras
 ```bash
-python test_uj201_with_cameras.py
+python examples/uj201_follower/test_robot_cameras.py
 ```
 - Validates robot can read cameras
 - Checks observation dict structure
@@ -20,7 +22,7 @@ python test_uj201_with_cameras.py
 
 ### 3. Test VLA Inference
 ```bash
-python test_uj201_vla_inference.py
+python examples/uj201_follower/test_vla_inference.py
 ```
 - Loads SmolVLA model (450M params)
 - Runs full control loop: camera → VLA → motors
@@ -87,7 +89,7 @@ huggingface-cli download lerobot/smolvla_base
 These are lint warnings - the packages are installed in the conda environment. Run:
 ```bash
 conda activate UJ201
-python test_uj201_cameras.py  # Should work despite lint errors
+python examples/uj201_follower/test_cameras.py  # Should work despite lint errors
 ```
 
 ## Output Files
@@ -101,7 +103,7 @@ All test scripts save results to timestamped directories:
 
 ⚠️ All scripts use `max_relative_target=10.0` (10° safety limit per step)
 
-⚠️ Motors 2 and 3 are mechanically coupled - see `test_gearbox_shoulder.py` for details
+⚠️ Motors 2 and 3 are mechanically coupled - see `debug/test_gearbox_shoulder.py` for details
 
 ⚠️ Always supervise VLA control during first runs
 
@@ -116,16 +118,17 @@ All test scripts save results to timestamped directories:
 
 | File | Purpose |
 |------|---------|
-| `test_uj201_cameras.py` | Camera-only testing |
-| `test_uj201_with_cameras.py` | Robot + camera integration |
-| `test_uj201_vla_inference.py` | Full VLA control loop |
+| `test_cameras.py` | Camera-only testing |
+| `test_robot_cameras.py` | Robot + camera integration |
+| `test_vla_inference.py` | Full VLA control loop |
+| `collect_data.py` | Data collection for training |
 | `CAMERA_VLA_README.md` | Comprehensive documentation |
 | `QUICKSTART.md` | This file |
-| `test_gearbox_shoulder.py` | Motor coupling tests |
+| `debug/test_gearbox_shoulder.py` | Motor coupling tests |
 
 ## Example VLA Tasks
 
-Edit the `TASK` variable in `test_uj201_vla_inference.py`:
+Edit the `TASK` variable in `test_vla_inference.py`:
 
 ```python
 TASK = "pick up the red block and place it in the box"

@@ -20,12 +20,14 @@ lerobot-find-cameras opencv
 
 ## Test Scripts
 
-### 1. Camera Testing (`test_uj201_cameras.py`)
+All scripts are in `examples/uj201_follower/`. Run from the repository root.
+
+### 1. Camera Testing (`test_cameras.py`)
 
 Tests cameras independently without robot:
 
 ```bash
-python test_uj201_cameras.py
+python examples/uj201_follower/test_cameras.py
 ```
 
 **Features:**
@@ -41,12 +43,12 @@ python test_uj201_cameras.py
 - Sample frames: `camera_test_results/wrist_test_*.jpg`, `scene_test_*.jpg`
 - Snapshots: `camera_test_results/snapshot_*.jpg`
 
-### 2. Robot + Camera Integration (`test_uj201_with_cameras.py`)
+### 2. Robot + Camera Integration (`test_robot_cameras.py`)
 
 Tests robot with cameras integrated:
 
 ```bash
-python test_uj201_with_cameras.py
+python examples/uj201_follower/test_robot_cameras.py
 ```
 
 **Features:**
@@ -74,12 +76,12 @@ python test_uj201_with_cameras.py
 }
 ```
 
-### 3. VLA Inference (`test_uj201_vla_inference.py`)
+### 3. VLA Inference (`test_vla_inference.py`)
 
 Full SmolVLA control loop:
 
 ```bash
-python test_uj201_vla_inference.py
+python examples/uj201_follower/test_vla_inference.py
 ```
 
 **Features:**
@@ -215,7 +217,7 @@ obs = robot.get_observation()
 ## Next Steps
 
 ### Option 1: Test with Pretrained Model
-Run `test_uj201_vla_inference.py` to test SmolVLA zero-shot performance on your task.
+Run `test_vla_inference.py` to test SmolVLA zero-shot performance on your task.
 
 ### Option 2: Collect Training Data
 Use `lerobot-record` to collect demonstration data:
@@ -248,7 +250,7 @@ lerobot-train \
 Integrate VLA control into your application:
 
 ```python
-from test_uj201_vla_inference import *
+from examples.uj201_follower.test_vla_inference import *
 
 # Initialize once
 model = SmolVLAPolicy.from_pretrained("your-fine-tuned-model")
@@ -333,7 +335,7 @@ Already installed in lerobot environment:
 ⚠️ **Mechanical Coupling**:
 - Motors 2 (gearbox) and 3 (shoulder) are mechanically coupled at 2:1 ratio
 - VLA must learn this constraint during training
-- See `test_gearbox_shoulder.py` for coupling details
+- See `debug/test_gearbox_shoulder.py` for coupling details
 
 ## References
 
