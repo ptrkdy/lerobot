@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "lerobot": {
+      "command": "conda",
+      "args": ["run", "-n", "UJ201", "--no-capture-output", "lerobot-mcp"]
+    }
+  }
+}
